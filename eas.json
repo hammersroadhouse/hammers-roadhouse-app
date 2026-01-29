@@ -14,14 +14,14 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true,
-      "android": {
-        "image": "latest"
-      },
-      "env": {
-        "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
-      }
-    }
+  "autoIncrement": true,
+  "android": {
+    "image": "sdk-52"
+  },
+  "env": {
+    "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+  }
+}
   },
   "submit": {
     "production": {}
