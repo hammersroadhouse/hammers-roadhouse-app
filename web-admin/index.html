@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hammers Road House - Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎸 Hammers Road House</h1>
+            <p class="subtitle">Admin Control Panel</p>
+            <div class="convex-config">
+                <label class="convex-label" for="convexUrlInput">Convex URL</label>
+                <input
+                    id="convexUrlInput"
+                    class="convex-input"
+                    type="text"
+                    placeholder="https://xxxxx.convex.cloud"
+                />
+                <button id="saveConvexUrlBtn" class="btn btn-secondary">Save</button>
+                <span id="convexUrlDisplay" class="convex-current"></span>
+                <span class="convex-current">Tip: use the *.convex.cloud URL here (queries/mutations). Push endpoints use *.convex.site automatically. Example: ?convexUrl=https://graceful-mouse-550.convex.cloud</span>
+            </div>
+        </header>
+
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="stat-card">
+                <h3 id="totalMessages">0</h3>
+                <p>Chat Messages</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalRequests">0</h3>
+                <p>Listener Requests</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="activeUsers">0</h3>
+                <p>Active Listeners</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="recentlyPlayedCount">0</h3>
+                <p>Recently Played</p>
+            </div>
+        </section>
+
+        <!-- Admin Actions -->
+        <section class="admin-actions">
+            <h2>Admin Actions</h2>
+            <div class="button-group">
+                <button id="clearChatBtn" class="btn btn-danger">
+                    🗑️ Clear All Chat
+                </button>
+                <button id="clearRequestsBtn" class="btn btn-danger">
+                    🗑️ Clear All Requests (Song + Listener)
+                </button>
+                <button id="clearNowPlayingBtn" class="btn btn-warning">
+                    ⏹️ Clear Now Playing
+                </button>
+                <button id="clearRecentlyPlayedBtn" class="btn btn-warning">
+                    🗑️ Clear Recently Played
+                </button>
+                <button id="clearListenersBtn" class="btn btn-warning">
+                    👥 Clear Active Listeners
+                </button>
+                <button id="refreshBtn" class="btn btn-primary">
+                    🔄 Refresh Data
+                </button>
+            </div>
+        </section>
+
+        <!-- Now Playing Section -->
+        <section class="data-section">
+            <h2>Now Playing</h2>
+            <div id="nowPlaying" class="data-list">
+                <p class="loading">Loading...</p>
+            </div>
+        </section>
+
+        <!-- Active Listeners Section -->
+        <section class="data-section">
+            <h2>Active Listeners <span id="listenerCount" class="count">0</span></h2>
+            <div id="activeListeners" class="data-list">
+                <p class="loading">Loading...</p>
+            </div>
+        </section>
+
+        <!-- Chat Messages Section -->
+        <section class="data-section">
+            <h2>Chat Messages <span id="messageCount" class="count">0</span></h2>
+            <div id="chatMessages" class="data-list">
+                <p class="loading">Loading messages...</p>
+            </div>
+        </section>
+
+        <!-- DJ Messages/Requests Section -->
+        <section class="data-section">
+            <h2>📬 Listener Requests <span id="djMessageCount" class="count">0</span></h2>
+            <div class="button-group">
+                <button id="clearDJMessagesBtn" class="btn btn-danger">
+                    🗑️ Clear All Requests
+                </button>
+            </div>
+            <div id="djMessages" class="data-list">
+                <p class="loading">Loading requests...</p>
+            </div>
+        </section>
+
+        <!-- Song Requests Section (Legacy - can remove later) -->
+        <section class="data-section" style="display: none;">
+            <h2>Song Requests <span id="requestCount" class="count">0</span></h2>
+            <div id="songRequests" class="data-list">
+                <p class="loading">Loading requests...</p>
+            </div>
+        </section>
+
+        <!-- Push Notifications Section -->
+        <section class="data-section">
+            <h2>📢 Push Notifications</h2>
+            <p class="muted" id="pushTokenStats">Registered devices: —</p>
+            <div class="form-row">
+                <label for="notificationTitle">Title</label>
+                <input id="notificationTitle" type="text" placeholder="Breaking news..." />
+            </div>
+            <div class="form-row">
+                <label for="notificationBody">Message</label>
+                <textarea id="notificationBody" placeholder="Notification message" rows="3"></textarea>
+            </div>
+            <div class="button-group">
+                <button id="sendToAllBtn" class="btn btn-primary">
+                    📢 Send to All Listeners
+                </button>
+            </div>
+        </section>
+
+        <!-- Status Bar -->
+        <div id="statusBar" class="status-bar"></div>
+    </div>
+
+    <!-- Convex (UMD bundle) -->
+    <script src="https://cdn.jsdelivr.net/npm/convex@1.16.2/dist/browser.bundle.js"></script>
+    <!-- Admin App -->
+    <script src="admin.js?v=20260128"></script>
+</body>
+</html>

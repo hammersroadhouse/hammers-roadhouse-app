@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hammers Road House - DJ Dashboard</title>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+body {
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+background: linear-gradient(135deg, #0F0F0F 0%, #1A1A1A 100%);
+color: #FFFFFF;
+min-height: 100vh;
+padding: 20px;
+}
+
+.header {
+text-align: center;
+margin-bottom: 40px;
+}
+
+.header h1 {
+font-size: 32px;
+color: #FF5722;
+margin-bottom: 8px;
+}
+
+.header p {
+color: #888;
+font-size: 14px;
+}
+
+.stats {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 16px;
+margin-bottom: 32px;
+}
+
+.stat-card {
+background: #1A1A1A;
+border: 1px solid #404040;
+border-radius: 12px;
+padding: 20px;
+text-align: center;
+}
+
+.stat-number {
+font-size: 36px;
+font-weight: bold;
+color: #FF5722;
+margin-bottom: 8px;
+}
+
+.stat-label {
+color: #888;
+font-size: 14px;
+}
+
+.filter-tabs {
+display: flex;
+gap: 8px;
+margin-bottom: 24px;
+border-bottom: 1px solid #404040;
+padding-bottom: 8px;
+}
+
+.filter-tab {
+background: transparent;
+border: none;
+color: #888;
+padding: 12px 24px;
+cursor: pointer;
+border-radius: 8px;
+font-size: 14px;
+font-weight: 600;
+transition: all 0.2s;
+}
+
+.filter-tab:hover {
+background: #1A1A1A;
+}
+
+.filter-tab.active {
+background: #FF5722;
+color: white;
+}
+
+.requests-container {
+display: grid;
+gap: 12px;
+}
+
+.request-card {
+background: #1A1A1A;
+border: 1px solid #404040;
+border-radius: 12px;
+padding: 16px;
+display: flex;
+align-items: center;
+gap: 16px;
+transition: all 0.2s;
+}
+
+.request-card:hover {
+border-color: #FF5722;
+transform: translateY(-2px);
+}
+
+.album-art {
+width: 80px;
+height: 80px;
+border-radius: 8px;
+object-fit: cover;
+background: #2A2A2A;
+}
+
+.request-info {
+flex: 1;
+}
+
+.song-title {
+font-size: 18px;
+font-weight: 600;
+margin-bottom: 4px;
+}
+
+.song-artist {
+color: #888;
+font-size: 14px;
+margin-bottom: 4px;
+}
+
+.song-meta {
+color: #666;
+font-size: 12px;
+}
+
+.requested-by {
+background: #FF5722;
+color: white;
+padding: 4px 12px;
+border-radius: 6px;
+font-size: 12px;
+display: inline-block;
+margin-top: 8px;
+}
+
+.actions {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.btn {
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+font-weight: 600;
+font-size: 14px;
+transition: all 0.2s;
+white-space: nowrap;
+}
+
+.btn:hover {
+transform: scale(1.05);
+}
+
+.btn-approve {
+background: #4CAF50;
+color: white;
+}
+
+.btn-played {
+background: #2196F3;
+color: white;
+}
+
+.btn-delete {
+background: #f44336;
+color: white;
+}
+
+.btn:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+}
+
+.loading {
+text-align: center;
+padding: 40px;
+color: #888;
+}
+
+.empty {
+text-align: center;
+padding: 60px 20px;
+color: #888;
+}
+
+.empty-icon {
+font-size: 64px;
+margin-bottom: 16px;
+}
+
+.status-badge {
+padding: 4px 12px;
+border-radius: 6px;
+font-size: 12px;
+font-weight: 600;
+text-transform: uppercase;
+}
+
+.status-pending {
+background: #666;
+color: white;
+}
+
+.status-approved {
+background: #FF5722;
+color: white;
+}
+
+.status-played {
+background: #4CAF50;
+color: white;
+}
+
+.setup-notice {
+background: #FF5722;
+color: white;
+padding: 16px;
+border-radius: 12px;
+margin-bottom: 24px;
+text-align: center;
+}
+
+.setup-notice strong {
+display: block;
+margin-bottom: 8px;
+font-size: 18px;
+}
+
+.setup-notice code {
+background: rgba(0,0,0,0.3);
+padding: 2px 8px;
+border-radius: 4px;
+font-family: 'Courier New', monospace;
+}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🎸 Hammers Road House - DJ Dashboard</h1>
+<p>Powered by Blast Radio</p>
+</div>
+
+<div class="setup-notice" id="setupNotice">
+<strong>⚠️ Setup Required</strong>
+<p>Replace <code>YOUR_CONVEX_URL</code> below with your actual Convex deployment URL</p>
+<p>Find it in: <code>.a0/project-context.yaml</code> → <code>convex_url</code></p>
+</div>
+
+<div class="stats" id="stats">
+<div class="stat-card">
+<div class="stat-number" id="pendingCount">-</div>
+<div class="stat-label">Pending</div>
+</div>
+<div class="stat-card">
+<div class="stat-number" id="approvedCount">-</div>
+<div class="stat-label">Approved</div>
+</div>
+<div class="stat-card">
+<div class="stat-number" id="playedCount">-</div>
+<div class="stat-label">Played</div>
+</div>
+<div class="stat-card">
+<div class="stat-number" id="totalCount">-</div>
+<div class="stat-label">Total</div>
+</div>
+</div>
+
+<div class="filter-tabs">
+<button class="filter-tab active" data-filter="all">All</button>
+<button class="filter-tab" data-filter="pending">Pending</button>
+<button class="filter-tab" data-filter="approved">Approved</button>
+<button class="filter-tab" data-filter="played">Played</button>
+</div>
+
+<div class="loading" id="loading">Loading requests...</div>
+<div class="requests-container" id="requestsContainer" style="display: none;"></div>
+<div class="empty" id="empty" style="display: none;">
+<div class="empty-icon">🎵</div>
+<div>No requests yet</div>
+</div>
+
+<script type="module">
+// ⚠️ REPLACE THIS WITH YOUR ACTUAL CONVEX URL
+const CONVEX_URL = "https://resilient-warbler-266.convex.cloud";
+
+import { ConvexHttpClient } from "https://cdn.jsdelivr.net/npm/convex@1.16.3/+esm";
+
+const client = new ConvexHttpClient(CONVEX_URL);
+let allRequests = [];
+let currentFilter = 'all';
+
+// Check if setup is complete
+if (CONVEX_URL === "YOUR_CONVEX_URL") {
+document.getElementById('loading').style.display = 'none';
+return;
+}
+document.getElementById('setupNotice').style.display = 'none';
+
+// Load requests
+async function loadRequests() {
+try {
+allRequests = await client.query("requests:getAllRequests", {});
+updateStats();
+renderRequests();
+} catch (error) {
+console.error('Error loading requests:', error);
+document.getElementById('loading').textContent = 'Error loading requests. Check console.';
+}
+}
+
+// Update stats
+function updateStats() {
+const pending = allRequests.filter(r => r.status === 'pending').length;
+const approved = allRequests.filter(r => r.status === 'approved').length;
+const played = allRequests.filter(r => r.status === 'played').length;
+
+document.getElementById('pendingCount').textContent = pending;
+document.getElementById('approvedCount').textContent = approved;
+document.getElementById('playedCount').textContent = played;
+document.getElementById('totalCount').textContent = allRequests.length;
+}
+
+// Render requests
+function renderRequests() {
+const container = document.getElementById('requestsContainer');
+const loading = document.getElementById('loading');
+const empty = document.getElementById('empty');
+
+loading.style.display = 'none';
+
+const filtered = currentFilter === 'all' 
+? allRequests 
+: allRequests.filter(r => r.status === currentFilter);
+
+if (filtered.length === 0) {
+container.style.display = 'none';
+empty.style.display = 'block';
+return;
+}
+
+empty.style.display = 'none';
+container.style.display = 'grid';
+
+function formatDuration(seconds) {
+const mins = Math.floor(seconds / 60);
+const secs = seconds % 60;
+return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+container.innerHTML = filtered.map(request => {
+const duration = formatDuration(request.duration);
+const timestamp = new Date(request._creationTime).toLocaleString();
+
+return `
+<div class="request-card">
+<img src="${request.albumArt}" class="album-art" alt="Album art" />
+<div class="request-info">
+<div class="song-title">${request.title}</div>
+<div class="song-artist">${request.artist}</div>
+${request.album ? `<div class="song-meta">${request.album} • ${duration}</div>` : `<div class="song-meta">${duration}</div>`}
+<div class="requested-by">@${request.username} • ${request.userFirstName} (${request.userEmail})</div>
+<span class="status-badge status-${request.status}">${request.status}</span>
+<div class="song-meta" style="margin-top: 8px;">${timestamp}</div>
+</div>
+<div class="actions">
+${request.status === 'pending' ? `
+<button class="btn btn-approve" onclick="updateStatus('${request._id}', 'approved')">
+✓ Approve
+</button>
+` : ''}
+${request.status === 'approved' ? `
+<button class="btn btn-played" onclick="updateStatus('${request._id}', 'played')">
+▶ Mark Played
+</button>
+` : ''}
+<button class="btn btn-delete" onclick="deleteRequest('${request._id}')">
+🗑️ Delete
+</button>
+</div>
+</div>
+`;
+}).join('');
+}
+
+// Update request status
+window.updateStatus = async (requestId, status) => {
+try {
+await client.mutation("requests:updateRequestStatus", {
+  requestId,
+  status,
+});
+await loadRequests();
+} catch (error) {
+console.error('Error updating status:', error);
+alert('Failed to update status');
+}
+};
+
+// Delete request
+window.deleteRequest = async (requestId) => {
+if (!confirm('Are you sure you want to delete this request?')) return;
+
+try {
+await client.mutation("requests:deleteRequest", { requestId });
+await loadRequests();
+} catch (error) {
+console.error('Error deleting request:', error);
+alert('Failed to delete request');
+}
+};
+
+// Filter tabs
+document.querySelectorAll('.filter-tab').forEach(tab => {
+tab.addEventListener('click', () => {
+document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+tab.classList.add('active');
+currentFilter = tab.dataset.filter;
+renderRequests();
+});
+});
+
+// Auto-refresh every 5 seconds
+setInterval(loadRequests, 5000);
+
+// Initial load
+loadRequests();
+</script>
+</body>
+</html>
